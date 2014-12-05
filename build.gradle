@@ -1,0 +1,60 @@
+/*
+ * Copyright 2014 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+repositories {
+  jcenter()
+}
+
+group = "com.netflix.gradle.plugins"
+
+dependencies {
+  compile 'com.amazonaws:aws-java-sdk:1.9.4'
+  compile 'com.netflix.nebula:gradle-ospackage-plugin:2.0.+'
+  compile 'com.squareup.retrofit:retrofit:1.6.1'
+  compile 'com.squareup.retrofit:converter-jackson:1.6.1'
+  compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+  compile 'com.aestasit.infrastructure.sshoogr:sshoogr:0.9.15', {
+    exclude module: 'groovy-all'
+  }
+  compile gradleApi()
+}
+
+idea {
+  project {
+    ipr.withXml { provider ->
+      def node = provider.asNode()
+      node.component.find { it.'@name' == 'VcsDirectoryMappings' }?.mapping[0].'@vcs' = 'Git'
+      def copyrightManager = node.component.find { it.'@name' == 'CopyrightManager' }
+      copyrightManager.@default = "ASL2"
+      def aslCopyright = copyrightManager.copyright.find { it.option.find { it.@name == "myName" }?.@value == "ASL2" }
+      if (aslCopyright == null) {
+        copyrightManager.append(new XmlParser().parseText("""
+            <copyright>
+              <option name="notice" value="Copyright \$today.year Netflix, Inc.&#10;&#10;Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);&#10;you may not use this file except in compliance with the License.&#10;You may obtain a copy of the License at&#10;&#10;   http://www.apache.org/licenses/LICENSE-2.0&#10;&#10;Unless required by applicable law or agreed to in writing, software&#10;distributed under the License is distributed on an &quot;AS IS&quot; BASIS,&#10;WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.&#10;See the License for the specific language governing permissions and&#10;limitations under the License." />
+              <option name="keyword" value="Copyright" />
+              <option name="allowReplaceKeyword" value="" />
+              <option name="myName" value="ASL2" />
+              <option name="myLocal" value="true" />
+            </copyright>
+          """))
+      }
+    }
+  }
+}
