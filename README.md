@@ -1,7 +1,7 @@
 Zero to Cloud Gradle Plugin
 ===
 
-A Gradle Plugin to assist in the initialization of a NetflixOSS-based cloud environment.
+A Gradle Plugin to assist in the initialization of a NetflixOSS-based cloud and continuous delivery environment.
 
 Getting Started - Initializing the Cloud
 ===
